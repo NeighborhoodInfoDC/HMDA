@@ -32,7 +32,7 @@
 
 %macro web_varcreate;
 
-NumMrtgOrigHomePurchPerUnit = NumMrtgOrigHomePurch1_4m / NumHsngUnits1_4Fam;
+NumMrtgOrigHomePurchPerUnit = NumMrtgOrigHomePurch1_4m / NumHsngUnits1_4Fam *1000;
 PctSubprimeConvOrigHomePur = NumSubprimeConvOrigHomePur / NumConvMrtgOrigHomePurch;
 
 label NumMrtgOrigHomePurchPerUnit = "Loans per 1,000 housing units";
