@@ -19,10 +19,11 @@
    05/04/10 CJN Updated for 2008 data processing.
    09/09/12 PAT Updated for new 2010/2012 geos.
                 New weights for Median and MrtgOrigMedAmt vars.
+   03/15/18 NS  Changed from K drive to L drive
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
-%include "K:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
+%include "L:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
+%include "L:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
 
 ** Define libraries **;
 %DCData_lib( Hmda )
