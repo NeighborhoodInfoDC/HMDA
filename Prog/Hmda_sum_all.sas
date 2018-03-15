@@ -19,19 +19,17 @@
    05/04/10 CJN Updated for 2008 data processing.
    09/09/12 PAT Updated for new 2010/2012 geos.
                 New weights for Median and MrtgOrigMedAmt vars.
-   03/15/18 NS  Changed from K drive to L drive
+   03/15/18 NS  Changed from K drive to L drive, update for cluster 2017 geo
 **************************************************************************/
 
-%include "L:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
-%include "L:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
+%include "L:\SAS\Inc\StdLocal.sas"; 
 
 ** Define libraries **;
 %DCData_lib( Hmda )
 
-rsubmit;
 
 /** Update with information on latest file revision **/
-%let revisions = %str(Updated for new 2010/2012 geos. New weights for Median and MrtgOrigMedAmt vars.);
+%let revisions = %str(Updated for cluster 2017 geography);
 
 %Create_all_summary_from_tracts( 
   
@@ -52,6 +50,3 @@ rsubmit;
 
 run;
 
-endrsubmit;
-
-signoff;
