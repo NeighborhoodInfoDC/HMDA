@@ -15,12 +15,15 @@
 ** Define libraries **;
 %DCData_lib( HMDA )
 
+%let revisions = New file ;
+
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
 %let filename = hmda_lar_2017b.csv;
 %let year = 2017;
 
 filename fimport "&rawpath.&filename." lrecl=2000;
 
+/* Read raw HMDA from CSV */
 data hmda_&year._raw;
 
   infile FIMPORT delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
@@ -185,45 +188,184 @@ data hmda_&year._raw;
 	tract_to_msamd_income 
 	;
 
+run;
 
-/*
-  
-  format SALEDATE yymmdd10.;
-	format	 DEEDDATE yymmdd10.;
-	format	 EXTRACTDAT yymmdd10.;
 
-drop c_SALEDATE c_DEEDDATE c_EXTRACTDAT in_usecode;*/
+/* Process a clean HMDA file */
+data hmda_&year._clean;
+	set hmda_&year._raw;
+
+	/* Set length for variables */
+	length action $1.
+	 	   agency $1.
+		   appdate $1.
+		   appdate $1.
+		   apprac $1.
+		   appsex $1.
+		   coapethn $1.
+		   coaprac $1.
+		   coaprac2 $1.
+		   coaprac3 $1.
+		   coaprac4 $1.
+		   coaprac5 $1.
+		   coapsex $1.
+		   deny1 $1.
+		   deny2 $1.
+		   deny3 $1.
+		   edit $1.
+		   ethn $1.
+		   hoepa $1.
+		   lien $1.
+		   metro $5.
+		   occupanc $1.
+		   prch_typ $1.
+		   preapp $1.
+		   purpose $1.
+		   race2 $1.
+		   race3 $1.
+		   race4 $1.
+		   race5 $1.
+		   type $1.
+		   county $3.
+		   ucounty $5.
+		   year $4.
+		   state $2.
+		   tract $6.
+	;
+
+	/* Create clean versions of variables */
+	action = put(action_taken,1.);
+	agency = put(agency_code,1.);
+	amount = loan_amount_000s * 1000;
+	appdate = put(application_date_indicator,1.);
+	apprac = put(applicant_race_1,1.);
+	appsex = put(applicant_sex,1.);
+	coapethn = put(co_applicant_ethnicity,1.);
+	coaprac = put(co_applicant_race_1,1.);
+	coaprac2 = put(co_applicant_race_2,1.);
+	coaprac3 = put(co_applicant_race_3,1.);
+	coaprac4 = put(co_applicant_race_4,1.);
+	coaprac5 = put(co_applicant_race_5,1.);
+	coapsex = put(co_applicant_sex,1.);
+	deny1 = put(denial_reason_1,1.);
+	deny2 = put(denial_reason_1,1.);
+	deny3 = put(denial_reason_1,1.);
+	edit = put(edit_status,1.);
+	ethn = put(applicant_ethnicity,1.);
+	hoepa = put(hoepa_status,1.);
+	hudmdinc = hud_median_family_income;
+	income = applicant_income_000s * 1000;
+	lien = put(lien,1.);
+	loantype = put(loan_type,1.);
+	metro = put(msamd,5.);
+	occupanc = put(owner_occupancy,1.);
+	prch_typ = put(purchaser_type,1.);
+	preapp = put(preapproval,1.);
+	purpose = put(loan_purpose,1.);
+	race2 = put(applicant_race_2,1.);
+	race3 = put(applicant_race_3,1.);
+	race4 = put(applicant_race_4,1.);
+	race5 = put(applicant_race_5,1.);
+	rtspread = rate_spread;
+	seq = sequence_number;
+	type = put(property_type,1.);
+	county = put(county_code,z3.);
+	year = put(as_of_year,4.);
+	state = put(state_code,2.);
+	tract = compress(census_tract_number,".");
+
+	/* Combined ucounty and geo2010 */
+	ucounty = state || county;
+	geo2010 = ucounty || tract ;
+
+	/* Create unique lender ID */
+	resp = compress(respondent_id,"-");
+	ulender = year || agency || resp;
+
+	/* Format everything */
+	format action $action.
+		   agency $agencyf.
+		   appdate $appdate.
+		   apprac coaprac coaprac2 coaprac3 coaprac4 coaprac5 race2 race3 race4 race5 $hmdrace.
+		   appsex coapsex $hmdsex.
+		   coapethn ethn $hmdethn.
+		   deny1 deny2 deny3 $deny.
+		   edit $edit.
+		   hoepa $hoepa.
+		   lien $lien.
+		   loantype loantyp.
+		   occupanc $occupan.
+		   prch_typ $prchtyp.
+		   preapp $preapp.
+		   purpose $purpose.
+		   type $proptyp.
+		   ucounty $cnty99f.
+	;
+
+	/* Labels */
+	label 
+	action = "Type of Action Taken"
+	agency = "Agency Code"
+	amount = "Loan amount ($)"
+	appdate = "Application date prior to HMDA reporting year "
+	apprac = "Applicant Race 1"
+	appsex = "Applicant Sex"
+	coapethn = "Co-Applicant Ethnicity"
+	coaprac = "Co-Applicant Race 1"
+	coaprac2 = "Co-Applicant Race 2"
+	coaprac3 = "Co-Applicant Race 3"
+	coaprac4 = "Co-Applicant Race 4"
+	coaprac5 = "Co-Applicant Race 5"
+	coapsex = "Co-Applicant Sex"
+	deny1 = "Denial Reason 1"
+	deny2 = "Denial Reason 2"
+	deny3 = "Denial Reason 3"
+	edit = "Loan record edit status"
+	ethn = "Applicant Ethnicity"
+	geo2010 = "Full census tract ID (2010): ssccctttttt"
+	hoepa = "HOEPA status (only for loans originated or purchased"
+	hudmdinc = "HUD median family income ($)"
+	income = "Applicant income ($)"
+	lien = "Lien status (only for applications and originations)"
+	loantype = "Type of Loan"
+	metro = "Metropolitan area code"
+	occupanc = "Owner-occupancy status of loan"
+	prch_typ = "Purchaser Type"
+	preapp = "Preapproval"
+	purpose = "Purpose of Loan"
+	race2 = "Applicant Race 2"
+	race3 = "Applicant Race 3"
+	race4 = "Applicant Race 4"
+	race5 = "Applicant Race 5"
+	rtspread = "Rate Spread"
+	seq = "Loan record sequence number"
+	type = "Type of property"
+	ucounty = "Full county FIPS: ssccc"
+	ulender = "Unique lender ID (year + agency + resp_id)"
+	year = "HMDA reporting year"
+	;
+
+	/* Final keep */
+	keep action agency amount appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
+	coapsex deny1 deny2 deny3 edit ethn geo2010 hoepa hudmdinc income lien loantype metro occupanc prch_typ
+	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year;
 
 run;
 
 
-proc import 
-	datafile = "L:\Libraries\HMDA\Raw\hmda_lar_2017.csv"
-	out = lar1
-	dbms = csv replace;
-	getnames = YES;
-run;
+%Finalize_data_set( 
+  /** Finalize data set parameters **/
+  data=hmda_&year._clean,
+  out=Loans_&year.,
+  outlib=hmda,
+  label="Mortgage loans (loan application record), Washington region, &year.",
+  sortby=ulender seq,
+  /** Metadata parameters **/
+  restrictions=None,
+  revisions=%str(&revisions),
+  /** File info parameters **/
+  printobs=5
+);
 
 
-
-proc import 
-	datafile = "L:\Libraries\HMDA\Raw\hmda_lar_2017b.csv"
-	out = lar2
-	dbms = csv replace;
-	getnames = YES;
-run;
-
-
-proc contents data = lar1 out = lar1cont; run;
-proc contents data = lar2 out = lar2cont; run;
-
-proc sort data = lar1cont; by varnum; run;
-proc sort data = lar2cont; by varnum; run;
-
-data lar_test;
-	merge lar1cont (in=a) lar2cont (in=b) ;
-	by name;
-	if a and b then inboth = 1;
-	if a and not b then ina = 1;
-	if b and not a then inb = 1;
-run;
+/* End of program */
