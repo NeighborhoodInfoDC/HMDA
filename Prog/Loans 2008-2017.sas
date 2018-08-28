@@ -17,11 +17,11 @@
 
 %let revisions = New file ;
 
-%let year = 2017;
-%let state = DC;
+%let year = 2016;
+%let state = VA;
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
-%let filename = hmda_lar_2017_&state..csv;
+%let filename = hmda_lar 2008_2017_&state..csv;
 
 /* Read raw HMDA from CSV */
 filename fimport "&rawpath.&filename." lrecl=2000;
@@ -232,7 +232,6 @@ data hmda_&state._&year._clean;
 		   year $4.
 		   state $2.
 		   tract $6.
-		   subprime_lender 3
 		   high_interest 3
 	;
 
@@ -258,7 +257,7 @@ data hmda_&state._&year._clean;
 	hoepa = put(hoepa_status,1.);
 	hudmdinc = hud_median_family_income;
 	income = applicant_income_000s * 1000;
-	lien = put(lien,1.);
+	lien = put(lien_status,1.);
 	loantype = put(loan_type,1.);
 	metro = put(msamd,5.);
 	occupanc = put(owner_occupancy,1.);
@@ -307,7 +306,7 @@ data hmda_&state._&year._clean;
 		   purpose $purpose.
 		   type $proptyp.
 		   ucounty $cnty99f.
-		   high_interest $dyesno.
+		   high_interest dyesno.
 	;
 
 	/* Labels */
@@ -351,7 +350,6 @@ data hmda_&state._&year._clean;
 	ucounty = "Full county FIPS: ssccc"
 	ulender = "Unique lender ID (year + agency + resp_id)"
 	year = "HMDA reporting year"
-	subprime_lender = "Loan issued by HUD-classified subprime lender"
 	high_interest = "High interest rate loan"
 	;
 
