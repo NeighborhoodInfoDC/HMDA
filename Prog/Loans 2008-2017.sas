@@ -17,14 +17,15 @@
 
 %let revisions = New file ;
 
-%let rawpath = &_dcdata_r_path\HMDA\Raw\;
-%let filename = hmda_lar_2017b.csv;
 %let year = 2017;
+%let state = DC;
 
-filename fimport "&rawpath.&filename." lrecl=2000;
+%let rawpath = &_dcdata_r_path\HMDA\Raw\;
+%let filename = hmda_lar_2017_&state..csv;
 
 /* Read raw HMDA from CSV */
-data hmda_&year._raw;
+filename fimport "&rawpath.&filename." lrecl=2000;
+data hmda_&state._allyear_raw;
 
   infile FIMPORT delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
 
@@ -192,8 +193,8 @@ run;
 
 
 /* Process a clean HMDA file */
-data hmda_&year._clean;
-	set hmda_&year._raw;
+data hmda_&state._&year._clean;
+	set hmda_&state._allyear_raw (where=(as_of_year=&year.)) ;
 
 	/* Set length for variables */
 	length action $1.
@@ -231,6 +232,8 @@ data hmda_&year._clean;
 		   year $4.
 		   state $2.
 		   tract $6.
+		   subprime_lender 3
+		   high_interest 3
 	;
 
 	/* Create clean versions of variables */
@@ -282,6 +285,10 @@ data hmda_&year._clean;
 	resp = compress(respondent_id,"-");
 	ulender = year || agency || resp;
 
+	/* High interest */
+	if rtspread > 0 then high_interest = 1;
+          else high_interest = 0;
+
 	/* Format everything */
 	format action $action.
 		   agency $agencyf.
@@ -300,6 +307,7 @@ data hmda_&year._clean;
 		   purpose $purpose.
 		   type $proptyp.
 		   ucounty $cnty99f.
+		   high_interest $dyesno.
 	;
 
 	/* Labels */
@@ -343,12 +351,14 @@ data hmda_&year._clean;
 	ucounty = "Full county FIPS: ssccc"
 	ulender = "Unique lender ID (year + agency + resp_id)"
 	year = "HMDA reporting year"
+	subprime_lender = "Loan issued by HUD-classified subprime lender"
+	high_interest = "High interest rate loan"
 	;
 
 	/* Final keep */
 	keep action agency amount appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
 	coapsex deny1 deny2 deny3 edit ethn geo2010 hoepa hudmdinc income lien loantype metro occupanc prch_typ
-	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year;
+	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest;
 
 run;
 
