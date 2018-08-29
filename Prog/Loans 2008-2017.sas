@@ -6,6 +6,8 @@
  Created:  08/27/18
  Version:  SAS 9.4
  Environment:  Windows 7
+ Description: Read raw HMDA data for the Washington region, create loan_yyyy
+		      base files. 
  Modifications: 
 
 **************************************************************************/
@@ -20,7 +22,7 @@
 
 %macro hmda_input (state);
 
-%do year = 2008 %to 2009 ;
+%do year = 2008 %to 2017 ;
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
 %let filename = hmda_lar 2008_2017_&state..csv;
@@ -285,9 +287,13 @@ data hmda_&state._&year._clean;
 
 	%if &year. < 2012 %then %do;
 	geo2000 = ucounty || tract ;
+	label geo2000 = "Full census tract ID (2000): ssccctttttt";
+	keep geo2000;
 	%end;
 	%else %do;
 	geo2010 = ucounty || tract ;
+	label geo2010 = "Full census tract ID (2010): ssccctttttt";
+	keep geo2010;
 	%end;
 
 	/* Create unique lender ID */
@@ -297,8 +303,6 @@ data hmda_&state._&year._clean;
 	/* High interest */
 	if rtspread > 0 then high_interest = 1;
           else high_interest = 0;
-
-
 
 	/* Format everything */
 	format action $action.
@@ -341,7 +345,6 @@ data hmda_&state._&year._clean;
 	deny3 = "Denial Reason 3"
 	edit = "Loan record edit status"
 	ethn = "Applicant Ethnicity"
-	geo2010 = "Full census tract ID (2010): ssccctttttt"
 	hoepa = "HOEPA status (only for loans originated or purchased"
 	hudmdinc = "HUD median family income ($)"
 	income = "Applicant income ($)"
@@ -367,7 +370,7 @@ data hmda_&state._&year._clean;
 
 	/* Final keep */
 	keep action agency amount appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
-	coapsex deny1 deny2 deny3 edit ethn geo2010 hoepa hudmdinc income lien loantype metro occupanc prch_typ
+	coapsex deny1 deny2 deny3 edit ethn hoepa hudmdinc income lien loantype metro occupanc prch_typ
 	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest;
 
 run;
@@ -375,13 +378,24 @@ run;
 %end;
 
 %mend hmda_input;
+%hmda_input (DC);
+%hmda_input (MD);
 %hmda_input (VA);
+%hmda_input (WV);
 
 
+/* Combine to create metro area files by year */
+%macro hmda_finalize ();
+
+%do year = 2008 %to 2017 ;
+
+data loans_was15_&year.;
+	set Hmda_dc_&year._clean Hmda_md_&year._clean Hmda_va_&year._clean Hmda_wv_&year._clean;
+run;
 
 %Finalize_data_set( 
   /** Finalize data set parameters **/
-  data=hmda_&year._clean,
+  data=loans_was15_&year.,
   out=Loans_&year.,
   outlib=hmda,
   label="Mortgage loans (loan application record), Washington region, &year.",
@@ -392,6 +406,12 @@ run;
   /** File info parameters **/
   printobs=5
 );
+
+%end;
+
+%mend hmda_finalize;
+%hmda_finalize;
+
 
 
 /* End of program */
