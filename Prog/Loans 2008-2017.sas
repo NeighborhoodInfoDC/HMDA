@@ -17,15 +17,17 @@
 
 %let revisions = New file ;
 
-%let year = 2016;
-%let state = VA;
+
+%macro hmda_input (state);
+
+%do year = 2008 %to 2009 ;
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
 %let filename = hmda_lar 2008_2017_&state..csv;
 
 /* Read raw HMDA from CSV */
 filename fimport "&rawpath.&filename." lrecl=2000;
-data hmda_&state._allyear_raw;
+data hmda_&state._&year._raw;
 
   infile FIMPORT delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
 
@@ -189,12 +191,14 @@ data hmda_&state._allyear_raw;
 	tract_to_msamd_income 
 	;
 
+	if as_of_year=&year. ;
+
 run;
 
 
 /* Process a clean HMDA file */
 data hmda_&state._&year._clean;
-	set hmda_&state._allyear_raw (where=(as_of_year=&year.)) ;
+	set hmda_&state._&year._raw;
 
 	/* Set length for variables */
 	length action $1.
@@ -276,9 +280,15 @@ data hmda_&state._&year._clean;
 	state = put(state_code,2.);
 	tract = compress(census_tract_number,".");
 
-	/* Combined ucounty and geo2010 */
+	/* Combined ucounty and geo2000/geo2010 */
 	ucounty = state || county;
+
+	%if &year. < 2012 %then %do;
+	geo2000 = ucounty || tract ;
+	%end;
+	%else %do;
 	geo2010 = ucounty || tract ;
+	%end;
 
 	/* Create unique lender ID */
 	resp = compress(respondent_id,"-");
@@ -287,6 +297,8 @@ data hmda_&state._&year._clean;
 	/* High interest */
 	if rtspread > 0 then high_interest = 1;
           else high_interest = 0;
+
+
 
 	/* Format everything */
 	format action $action.
@@ -359,6 +371,12 @@ data hmda_&state._&year._clean;
 	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest;
 
 run;
+
+%end;
+
+%mend hmda_input;
+%hmda_input (VA);
+
 
 
 %Finalize_data_set( 
