@@ -194,6 +194,7 @@ data hmda_&state._&year._raw;
 	;
 
 	if as_of_year=&year. ;
+	if census_tract_number ^= " ";
 
 run;
 
