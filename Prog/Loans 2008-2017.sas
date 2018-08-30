@@ -322,7 +322,7 @@ data hmda_&state._&year._clean;
 		   preapp $preapp.
 		   purpose $purpose.
 		   type $proptyp.
-		   ucounty $cnty99f.
+		   ucounty $cnty15f.
 		   high_interest dyesno.
 	;
 
@@ -370,6 +370,8 @@ data hmda_&state._&year._clean;
 	;
 
 	/* Final keep */
+	if put( ucounty, $ctym15f. ) ^= " ";
+
 	keep action agency amount appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
 	coapsex deny1 deny2 deny3 edit ethn hoepa hudmdinc income lien loantype metro occupanc prch_typ
 	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest;
