@@ -22,7 +22,7 @@
 
 %macro hmda_input (state);
 
-%do year = 2008 %to 2017 ;
+%do year = 2017 %to 2017 ;
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
 %let filename = hmda_lar 2008_2017_&state..csv;
@@ -193,8 +193,11 @@ data hmda_&state._&year._raw;
 	tract_to_msamd_income 
 	;
 
+	/* Keep only single year */
 	if as_of_year=&year. ;
-	if census_tract_number ^= " ";
+
+	/* Flag for missing tracts */
+	if census_tract_number = " " then tract_flag = 1;
 
 run;
 
@@ -282,9 +285,11 @@ data hmda_&state._&year._clean;
 	year = put(as_of_year,4.);
 	state = put(state_code,2.);
 	tract = compress(census_tract_number,".");
+	missingtract = tract_flag;
 
 	/* Combined ucounty and geo2000/geo2010 */
 	ucounty = state || county;
+	if put( ucounty, $ctym15f. ) ^= " ";
 
 	%if &year. < 2012 %then %do;
 	geo2000 = ucounty || tract ;
@@ -367,6 +372,7 @@ data hmda_&state._&year._clean;
 	ulender = "Unique lender ID (year + agency + resp_id)"
 	year = "HMDA reporting year"
 	high_interest = "High interest rate loan"
+	missingtract = "Flag for missing tract ID on raw data"
 	;
 
 	/* Final keep */
