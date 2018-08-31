@@ -28,7 +28,8 @@ proc format library=Hmda;
     "3" = "Federal Deposit Insurance Corporation"
     "4" = "Office of Thrift Supervision"
     "5" = "National Credit Union Administration"
-    "7" = "U.S. Department of Housing and Urban Development";
+    "7" = "U.S. Department of Housing and Urban Development"
+    "9" = "Consumer Financial Protection Bureau";
   
   value $agencys
     "1" = "OCC"
