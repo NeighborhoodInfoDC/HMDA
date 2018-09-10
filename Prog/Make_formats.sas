@@ -12,10 +12,10 @@
  Modifications:
   12/17/07  PAT Changed $purpose.
   09/23/08  PAT Added values 7 & 8 for $action.
+  08/28/18  RP Updated $agencys
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
-***%include "C:\DCData\SAS\Inc\Stdhead.sas";
+%include "L:\SAS\Inc\StdLocal.sas"; 
 
 ** Define libraries **;
 %DCData_lib( Hmda )
@@ -28,7 +28,8 @@ proc format library=Hmda;
     "3" = "Federal Deposit Insurance Corporation"
     "4" = "Office of Thrift Supervision"
     "5" = "National Credit Union Administration"
-    "7" = "U.S. Department of Housing and Urban Development";
+    "7" = "U.S. Department of Housing and Urban Development"
+    "9" = "Consumer Financial Protection Bureau";
   
   value $agencys
     "1" = "OCC"
@@ -36,7 +37,8 @@ proc format library=Hmda;
     "3" = "FDIC"
     "4" = "OTS"
     "5" = "NCUA"
-    "7" = "HUD";
+    "7" = "HUD"
+	"9" = "CFPB";
     
   value $othcodf
     "0" = "Bank, savings institution or credit union"
