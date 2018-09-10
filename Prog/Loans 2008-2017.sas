@@ -22,7 +22,7 @@
 
 %macro hmda_input (state);
 
-%do year = 2017 %to 2017 ;
+%do year = 2008 %to 2017 ;
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
 %let filename = hmda_lar 2008_2017_&state..csv;
