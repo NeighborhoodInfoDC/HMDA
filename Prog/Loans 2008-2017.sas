@@ -375,6 +375,30 @@ data hmda_&state._&year._clean;
 	missingtract = "Flag for missing tract ID on raw data"
 	;
 
+
+	/* Make sure missing is coded correctly */
+	%let clist = action agency appdate appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4
+				 coaprac5 coapsex deny1 deny2 deny3 edit ethn hoepa lien metro occupanc prch_typ preapp
+				 purpose race2 race3 race4 race5 type county ucounty year state tract ;
+
+	%macro fixmissing();
+	%let varlist = &clist. ;
+		%let i = 1;
+			%do %until (%scan(&varlist,&i,' ')=);
+				%let var=%scan(&varlist,&i,' ');
+		if &var. = "." then &var. = " " ;
+		else if &var. = "    ." then &var. = " " ;
+	%let i=%eval(&i + 1);
+			%end;
+		%let i = 1;
+			%do %until (%scan(&varlist,&i,' ')=);
+				%let var=%scan(&varlist,&i,' ');
+	%let i=%eval(&i + 1);
+			%end;
+	%mend fixmissing;
+	%fixmissing;
+
+
 	/* Final keep */
 	if put( ucounty, $ctym15f. ) ^= " ";
 
