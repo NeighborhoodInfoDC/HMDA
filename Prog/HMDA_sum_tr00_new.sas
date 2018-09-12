@@ -1,73 +1,87 @@
 /**************************************************************************
- Program:  HMDA_sum_tr00.sas
+ Program:  HMDA_sum_tr00_new.sas
  Library:  HMDA
  Project:  NeighborhoodInfo DC
- Author:   P. Tatian
- Created:  01/03/06
- Version:  SAS 8.2
- Environment:  Windows
+ Author:   Rob Pitingolo
+ Created:  9/11/18
+ Version:  SAS 9.4
+ Environment:  Windows 7
  
  Description:  Create HMDA summary indicator file for Census tracts
- (2000) from selected variables in DataPlace HMDA files.
+ (2000) from selected variables in HMDA files.
 
  When updating:
  1) Change the %let ADJ_YR = value to the latest HMDA year.
  2) Add new years to the section "** Reformat input data sets **;".
  
  Modifications:
-  01/25/07 PAT  Added 2005 data.
-  03/02/07 PAT  Added NumMrtgOrig_vli, NumMrtgOrig_li, NumMrtgOrig_mi,
-                NumMrtgOrig_hinc, NumMrtgOrig_Inc.
-  03/12/07 PAT  Added NumSubprimeConvOrigRefin, NumConvMrtgOrigRefin.
-  12/12/07 PAT  Substituted new 2005 data.
-        ******* TEMPORARY FIX UNTIL UPDATED 2004 DATA ARE AVAILABLE.
-                WILL NEED TO ADJUST HIGH COST LOAN VARS.
-
-  12/17/07 PAT  Added calculation of DenSubprimeMrtgPurchOtherX, 
-                DenSubprimeMrtgRefinOtherX, NumSubprimeMrtgPurchOtherX,
-                and NumSubprimeMrtgRefinOtherX.
-                
-                Added supplemental vars. DenSubprimeMrtgPurch_vli, 
-                DenSubprimeMrtgPurch_li, DenSubprimeMrtgPurch_mi, 
-                DenSubprimeMrtgPurch_hinc, DenSubprimeMrtgRefin_vli, 
-                DenSubprimeMrtgRefin_li, DenSubprimeMrtgRefin_mi, 
-                DenSubprimeMrtgRefin_hinc, NumSubprimeMrtgPurch_vli, 
-                NumSubprimeMrtgPurch_li, NumSubprimeMrtgPurch_mi, 
-                NumSubprimeMrtgPurch_hinc, NumSubprimeMrtgRefin_vli, 
-                NumSubprimeMrtgRefin_li, NumSubprimeMrtgRefin_mi, 
-                NumSubprimeMrtgRefin_hinc.                
-
-  12/21/07 PAT  Added vars for 2004-2005:
-                NumHighCostMrtgPurch_vli, NumHighCostMrtgPurch_li,
-                NumHighCostMrtgPurch_mi, NumHighCostMrtgPurch_hinc,
-                NumHighCostMrtgRefin_vli, NumHighCostMrtgRefin_li,
-                NumHighCostMrtgRefin_mi, NumHighCostMrtgRefin_hinc.
-                
-  09/19/08 PAT  Use DP summary file for all 2004 & 2005 vars (incl. subprime).
-                No longer uses ZIP MAGIC.
-  09/23/08 PAT  Renamed NumHighCost and DenHighCost vars with new DP names
-                (see ..\Doc\2004-2006 renamed HighCost vars.xls).
-                Added 2006 data.
-  09/03/09 PAT  Added vars:
-                NumHighOwnMrtgPurch_hi_vli
-                NumHighOwnMrtgPurch_hi_li
-                NumHighOwnMrtgPurch_hi_mi
-                NumHighOwnMrtgPurch_hi_hinc
-                DenHighOwnMrtgPurch_hi_vli
-                DenHighOwnMrtgPurch_hi_li
-                DenHighOwnMrtgPurch_hi_mi
-                DenHighOwnMrtgPurch_hi_hinc
-  04/26/10 PAT  Updated 2006 input data set name (no change in data).
-  04/26/10 CJN	Updated for 2007 data processing.
-  05/04/10 CJN	Updated for 2008 data processing.
+ 
 **************************************************************************/
 
-%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
+%include "L:\SAS\Inc\StdLocal.sas"; 
 
 ** Define libraries **;
 %DCData_lib( HMDA )
 
 %let ADJ_YR = 2008;      ** Dollar amounts will be inflation adjusted to this year **;
+
+%let year = 2009;
+
+
+data test_&year.;
+	set hmda.loans_&year.;
+
+	app=1;
+
+	/* Race flags */
+	%racecalc_04;
+
+	/* Gender flags */
+	%gender;
+	
+	/* Income recodes */
+	if income < 0 then inc = .;
+		else inc=income;
+	if amount < 0 then amount = .;
+		else amount=amount;
+
+	/* Purpose type flags */
+	%purp_type;
+
+	/* Property type flags */
+	%prop_type;
+
+	/* Loan type flags */
+	if loantype = '1' then conv = 1;
+		else if loantype in ('2', '3' , '4') then govt=1;
+
+	/* Analysis flags */
+	length f_denial highFlag f_lien 3.;
+
+	if appdate ne '1' then do;
+		*** flag variable for HOEPA vars ****;
+		if hoepa = 1 then f_hoepa=1;
+			else f_hoepa=0;
+		if lien = '1' then f_lien = 1;
+			else if lien = '2' then f_lien = 0;
+	end;
+
+	else do;
+		f_lien  = . ;
+		f_hoepa = . ;
+			end;
+
+	/* Denials flags */
+	if action = '3' then f_denial =1;
+		else f_denial = 0;
+	
+	/* High interest flag */
+	if high_interest = "1" then highflag=1;
+		else highflag=0;			
+
+
+run;
+
 
 /** Macro Hmda_dplace_reformat - Start Definition **/
 
