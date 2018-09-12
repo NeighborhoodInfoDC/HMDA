@@ -17,9 +17,20 @@
 ** Define libraries **;
 %DCData_lib( HMDA )
 
+ **limit to DC and drop withdrawna and cases closed for incompleteness **;
+data DC_homemortgage (where=(state="11"));
+set HMDA.loans_2017 ;
+state=substr(geo2010,1,2);
+run;
+
+data DC_homemortage_total ;
+set DC_homemortgage;
+if action in ("4","5") then delete; 
+run; 
+
 ** flag for home loan denial, what's the appropriate count for total loan applications?**;
 data Homemortgage(where=(purpose="1"));  
-	set HMDA.loans_2017 ;
+	set DC_homemortage_total  ;
 	if action=3 then denial = 1;
     record=1;
 run;
@@ -48,6 +59,7 @@ wgt_wgt_var=PopWt,
 out_ds_name=denial_by_ward,
 out_ds_label=%str(Population by age group from tract 2010 to ward),
 calc_vars= 
+
 ,
 calc_vars_labels=
 
