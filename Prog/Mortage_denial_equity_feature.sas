@@ -18,28 +18,30 @@
 %DCData_lib( HMDA )
 
  **limit to DC and drop withdrawna and cases closed for incompleteness **;
-data DC_homemortgage (where=(state="11"));
-set HMDA.loans_2017 ;
-state=substr(geo2010,1,2);
+data DC_homemortgage;
+	set HMDA.loans_2017 ;
+
+	state=substr(geo2010,1,2);
+	if state = "11";
+
+	if action not in ("4","5") and purpose= "1" then do; 
+		if action=3 then denial = 1;
+	    record=1;
+	end;
 run;
 
-data DC_homemortage_total ;
-set DC_homemortgage;
-if action in ("4","5") then delete; 
-run; 
 
-** flag for home loan denial, what's the appropriate count for total loan applications?**;
-data Homemortgage(where=(purpose="1"));  
-	set DC_homemortage_total  ;
-	if action=3 then denial = 1;
-    record=1;
+proc summary data=DC_homemortgage;
+	class geo2010;
+	var denial record ;
+	output	out=denial1 sum= ;
 run;
 
-proc summary data=Homemortgage;
-class geo2010;
-var denial record 
-;
-output	out=denial_tract2010	sum= ;
+
+data denial_tract2010;
+	set denial1;
+	if denial = . then denial = 0;
+	if geo2010 in ("11001"," ") then delete;
 run;
 
 proc sort data= denial_tract2010;
