@@ -10,7 +10,7 @@
  Description:  Create HMDA summary indicator file for Census tracts
  (2000) from selected variables in HMDA files.
 
- When updating: make sure there is an updated version of %hud_inc_yyyy
+ When updating: Make sure there is an updated version of %hud_inc_yyyy
 			    in the iPums macro library. 
  
  Modifications:
@@ -59,13 +59,19 @@ into :count_vars separated by " "
 from vars2000p (where=(prefix="NUM"));
 quit;
 
+proc sql noprint;
+select name
+into :median_vars separated by " "
+from vars2000p (where=(prefix="MED"));
+quit;
+
 /* Create summary files from 2000-tract files */
 %Create_all_summary_from_tracts( 
   lib=work,
   data_pre=hmda_long00,
   data_label=,
   count_vars=&count_vars., 
-  prop_vars=, 
+  prop_vars=&median_vars., 
   calc_vars=, 
   calc_vars_labels=,
   tract_yr=2000,
@@ -100,13 +106,19 @@ into :count_vars separated by " "
 from vars2010p (where=(prefix="NUM"));
 quit;
 
+proc sql noprint;
+select name
+into :median_vars separated by " "
+from vars2010p (where=(prefix="MED"));
+quit;
+
 /* Create summary files from 2010-tract files */
 %Create_all_summary_from_tracts( 
   lib=work,
   data_pre=hmda_long10,
   data_label=,
   count_vars=&count_vars., 
-  prop_vars=, 
+  prop_vars=&median_vars., 
   calc_vars=, 
   calc_vars_labels=,
   tract_yr=2010,
