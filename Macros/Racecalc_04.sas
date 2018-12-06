@@ -9,18 +9,16 @@
  
  Description:  HMDA Macro copied from NatData programming.
  
- Modifications:
+ Modifications: Updated because codes 6 through 8 don't line up with the original macro.
  
 **************************************************************************/
 
 %macro racecalc_04();
- 
-         *** create and init race flags ***;
-         length ind as wh bl hi mxd multiple np na withrace minority 3.;
-         array zerorace {*} ind as wh bl hi mxd multiple np na withrace minority;
-         do i = 1 to dim(zerorace);
-                 zerorace{i} = 0;
-         end;
+
+		 *** recode ethnicity for macro ***;
+		 if apprac = "4" then ethn = "1";
+		 if coaprac = "4" then ethn = "1";
+
  
          *** if either app or coapp is hispanic ****;
          if  ethn in ("1") or coapethn in ("1") then do;
@@ -34,36 +32,40 @@
          *** neither app or coapp is hispanic ***;
          else do;
                  *** has race value ****;
-                 if apprac in ("1","2","3","4","5") or coaprac in ("1","2","3","4","5") then withrace=1;
+                 if apprac in ("1","2","3","4","5","6") or coaprac in ("1","2","3","4","5","6") then withrace=1;
  
                  ****multiple race categories**;
-                 if race2 not in ("6","7","8","") then do;  **applicant has multiple races**;
-                         if coaprac in ("6","7","8","") then multiple=1 ;  **single applicant with multiple races***;
-                                 else if coaprac2 not in ("6","7","8","") then multiple = 1; **both app have multiple races*;
+                 if race2 not in ("7","8","") then do;  **applicant has multiple races**;
+                         if coaprac in ("7","8","") then multiple=1 ;  **single applicant with multiple races***;
+                                 else if coaprac2 not in ("7","8","") then multiple = 1; **both app have multiple races*;
                                  else mxd= 1 ;  ***co-applicants, one with multiple races, one without;
                  end;
  
                  *** no multiple races and no coapplicant/coapplicant race is missing or same race ****;
-                 else if coaprac in ("6","7","8","") or apprac=coaprac then do;
+                 else if coaprac in ("7","8","") or apprac=coaprac then do;
                          if apprac eq "1" then ind=1;
                                  else if apprac eq "2" then as=1;
                                  else if apprac eq "3" then bl=1;
                                  else if apprac eq "4" then as=1;
                                  else if apprac eq "5" then wh=1;
-                                 else if apprac eq "7" then na=1;
+								 else if apprac eq "6" then oth=1;
+                                 else if apprac eq "7" then np=1;
+								 else if apprac eq "8" then na=1;
                                  else np=1;
                  end;
  	
                  *** has coapplicant with/different race ****;
                  else do;
                          *** applicant race is missing - use coapplicant***;
-                         if apprac in ("6","7","8","") then do;
+                         if apprac in ("7","8","") then do;
                                  if coaprac eq "1" then ind=1;
                                  else if coaprac eq "2" then as=1;
                                  else if coaprac eq "3" then bl=1;
                                  else if coaprac eq "4" then as=1;
                                  else if coaprac eq "5" then wh=1;
-                                 else if coaprac eq "7" then na=1;
+								 else if coaprac eq "6" then oth=1;
+                                 else if coaprac eq "7" then np=1;
+								 else if coaprac eq "8" then na=1;
                                  else np=1;
                          end;
                          else do;
