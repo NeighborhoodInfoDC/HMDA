@@ -28,6 +28,9 @@
 
 %let revisions = New file ;
 
+%let tr2000data = hmda2009tr hmda2010tr hmda2011tr;
+%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr;
+
 
 
 /*Create tract-level summary file for each year of data */
@@ -36,7 +39,7 @@
 
 /* Merge 2000-tract year files */
 data hmda_long00_tr00;
-	merge hmda2009tr hmda2010tr hmda2011tr;
+	merge &tr2000data.;
 	by geo2000;
 run;
 
@@ -77,7 +80,7 @@ quit;
 
 /* Merge 2010-tract year files */
 data hmda_long10_tr10;
-	merge hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr;
+	merge &tr2010data.;
 	by geo2010;
 run;
 
@@ -146,7 +149,7 @@ revisions=&revisions.
 %hmda_merge (cluster2017,cl17);
 %hmda_merge (cluster_tr2000,cltr00);
 %hmda_merge (eor,eor);
-%hmda_merge (stantoncommons,stantonc);
+%hmda_merge (stantoncommons,stanc);
 %hmda_merge (voterpre2012,vp12);
 %hmda_merge (ward2002,wd02);
 %hmda_merge (ward2012,wd12);
