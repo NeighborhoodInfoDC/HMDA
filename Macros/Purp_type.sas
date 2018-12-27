@@ -65,4 +65,4 @@
  		
  		
  	
- 	%mend;
+ 	%mend purp_type;

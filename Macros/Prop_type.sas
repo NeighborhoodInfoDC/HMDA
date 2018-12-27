@@ -48,4 +48,4 @@
  		hasProp = 'has property type information'
  	;
  
- %mend;
+ %mend prop_type;
