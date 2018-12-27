@@ -134,7 +134,7 @@ quit;
 /* Merge summary files together into one big summary file */
 %macro hmda_merge(geo,geosuf);
 
-data hmda_p09_sum_&geosuf.;
+data hmda_sum_p09_&geosuf;
 	merge hmda_long00_&geosuf. hmda_long10_&geosuf.;
 	by &geo.;
 run;
