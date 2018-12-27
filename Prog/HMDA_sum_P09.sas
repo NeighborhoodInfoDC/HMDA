@@ -137,6 +137,11 @@ quit;
 data hmda_sum_p09_&geosuf;
 	merge hmda_long00_&geosuf. hmda_long10_&geosuf.;
 	by &geo.;
+
+	%if &geo. = geo2010 %then %do;
+	if geo2010 ^= "51013980200";
+	%end;
+
 run;
 
 /* Save final summary file */
