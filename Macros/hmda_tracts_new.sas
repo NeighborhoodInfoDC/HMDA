@@ -15,6 +15,8 @@
 
 %macro hmda_tracts_new (start_yr,end_yr);
 
+%local year geo geovfmt count_list median_list;
+
 %do year = &start_yr. %to &end_yr.;
 
 %if %upcase( &year ) < 2012 %then %do;
