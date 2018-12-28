@@ -24,12 +24,12 @@
 %DCData_lib( ipums )
 
 %let start_yr = 2009;
-%let end_yr = 2016;
+%let end_yr = 2017;
 
 %let revisions = New file ;
 
 %let tr2000data = hmda2009tr hmda2010tr hmda2011tr;
-%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr;
+%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr;
 
 
 
@@ -38,12 +38,12 @@
 
 
 /* Merge 2000-tract year files */
-data hmda_long00_tr00;
+data hmda_long00_tr00_m;
 	merge &tr2000data.;
 	by geo2000;
 run;
 
-proc contents data = hmda_long00_tr00 out = vars2000;
+proc contents data = hmda_long00_tr00_m out = vars2000;
 run;
 
 data vars2000p;
@@ -61,8 +61,8 @@ quit;
 
 
 /* Loop through and record missing variables as zero */
-data hmda_long00z_tr00;
-	set hmda_long00_tr00;
+data hmda_long00_tr00;
+	set hmda_long00_tr00_m;
 
 	%macro makezero();
 		%let varlist = &count_vars.;
@@ -91,7 +91,7 @@ quit;
 /* Create summary files from 2000-tract files */
 %Create_all_summary_from_tracts( 
   lib=work,
-  data_pre=hmda_long00z,
+  data_pre=hmda_long00,
   data_label=,
   count_vars=&count_vars., 
   prop_vars=&median_vars., 
@@ -108,12 +108,12 @@ quit;
 
 
 /* Merge 2010-tract year files */
-data hmda_long10_tr10;
+data hmda_long10_tr10_m;
 	merge &tr2010data.;
 	by geo2010;
 run;
 
-proc contents data = hmda_long10_tr10 out = vars2010;
+proc contents data = hmda_long10_tr10_m out = vars2010;
 run;
 
 data vars2010p;
@@ -130,8 +130,8 @@ from vars2010p (where=(prefix="NUM"));
 quit;
 
 /* Loop through and record missing variables as zero */
-data hmda_long10z_tr10;
-	set hmda_long10_tr10;
+data hmda_long10_tr10;
+	set hmda_long10_tr10_m;
 
 	%macro makezero();
 		%let varlist = &count_vars.;
@@ -160,7 +160,7 @@ quit;
 /* Create summary files from 2010-tract files */
 %Create_all_summary_from_tracts( 
   lib=work,
-  data_pre=hmda_long10z,
+  data_pre=hmda_long10,
   data_label=,
   count_vars=&count_vars., 
   prop_vars=&median_vars., 
@@ -191,8 +191,8 @@ run;
 
 /* Save final summary file */
 %Finalize_data_set( 
-data=hmda_p09_sum_&geosuf.,
-out=hmda_p09_sum_&geosuf.,
+data=hmda_sum_p09_&geosuf,
+out=hmda_sum_p09_&geosuf,
 outlib=hmda,
 label="HMDA summary, DC, &start_yr. - &end_yr.",
 sortby=&geo.,
