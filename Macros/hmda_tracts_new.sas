@@ -94,8 +94,49 @@ data apps&year.;
 	/* Create income categories from ipums %hud_inc macro */
 	if hhincome ^= . then do;
 	numprec = 4;
-	%Hud_inc_2009;
 	end;
+
+	%if &year. = 2009 %then %do;
+	%Hud_inc_2009;
+	%end;
+	%else %if &year. = 2010 %then %do;
+	%Hud_inc_2010;
+	%end;
+	%else %if &year. = 2011 %then %do;
+	%Hud_inc_2011;
+	%end;
+	%else %if &year. = 2012 %then %do;
+	%Hud_inc_2012;
+	%end;
+	%else %if &year. = 2013 %then %do;
+	%Hud_inc_2013;
+	%end;
+	%else %if &year. = 2014 %then %do;
+	%Hud_inc_2014;
+	%end;
+	%else %if &year. = 2015 %then %do;
+	%Hud_inc_2015;
+	%end;
+	%else %if &year. = 2016 %then %do;
+	%Hud_inc_2016;
+	%end;
+	%else %if &year. = 2017 %then %do;
+	%Hud_inc_2017;
+	%end;
+	%else %if &year. = 2018 %then %do;
+	%Hud_inc_2018;
+	%end;
+	%else %if &year. = 2019 %then %do;
+	%Hud_inc_2019;
+	%end;
+	%else %if &year. = 2020 %then %do;
+	%Hud_inc_2020;
+	%end;
+	%else %do;
+    %err_mput( macro= hmda_tracts_new, msg=Update hmda_tracts_new macro to include correct hud_inc_yyyy macro from Ipums library )
+    %goto macro_exit;
+	%end;
+
 
 	/* Mortgage loans for 1 to 4 family dwellings home purchase */
 	nummrtgorighomepurch1_4m_&year. = purch;
