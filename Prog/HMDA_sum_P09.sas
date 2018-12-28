@@ -59,6 +59,29 @@ into :count_vars separated by " "
 from vars2000p (where=(prefix="NUM"));
 quit;
 
+
+/* Loop through and record missing variables as zero */
+data hmda_long00z_tr00;
+	set hmda_long00_tr00;
+
+	%macro makezero();
+		%let varlist = &count_vars.;
+			%let i = 1;
+				%do %until (%scan(&varlist,&i,' ')=);
+					%let var=%scan(&varlist,&i,' ');
+			if &var. = . then &var. = 0;
+		%let i=%eval(&i + 1);
+				%end;
+			%let i = 1;
+				%do %until (%scan(&varlist,&i,' ')=);
+					%let var=%scan(&varlist,&i,' ');
+		%let i=%eval(&i + 1);
+				%end;
+	%mend makezero;
+	%makezero;
+
+run;
+
 proc sql noprint;
 select name
 into :median_vars separated by " "
@@ -68,7 +91,7 @@ quit;
 /* Create summary files from 2000-tract files */
 %Create_all_summary_from_tracts( 
   lib=work,
-  data_pre=hmda_long00,
+  data_pre=hmda_long00z,
   data_label=,
   count_vars=&count_vars., 
   prop_vars=&median_vars., 
@@ -106,6 +129,28 @@ into :count_vars separated by " "
 from vars2010p (where=(prefix="NUM"));
 quit;
 
+/* Loop through and record missing variables as zero */
+data hmda_long10z_tr10;
+	set hmda_long10_tr10;
+
+	%macro makezero();
+		%let varlist = &count_vars.;
+			%let i = 1;
+				%do %until (%scan(&varlist,&i,' ')=);
+					%let var=%scan(&varlist,&i,' ');
+			if &var. = . then &var. = 0;
+		%let i=%eval(&i + 1);
+				%end;
+			%let i = 1;
+				%do %until (%scan(&varlist,&i,' ')=);
+					%let var=%scan(&varlist,&i,' ');
+		%let i=%eval(&i + 1);
+				%end;
+	%mend makezero;
+	%makezero;
+
+run;
+
 proc sql noprint;
 select name
 into :median_vars separated by " "
@@ -115,7 +160,7 @@ quit;
 /* Create summary files from 2010-tract files */
 %Create_all_summary_from_tracts( 
   lib=work,
-  data_pre=hmda_long10,
+  data_pre=hmda_long10z,
   data_label=,
   count_vars=&count_vars., 
   prop_vars=&median_vars., 
