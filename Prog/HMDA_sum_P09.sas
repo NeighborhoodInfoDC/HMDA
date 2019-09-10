@@ -177,7 +177,9 @@ quit;
 
 
 /* Merge summary files together into one big summary file */
-%macro hmda_merge(geo,geosuf);
+%macro hmda_merge(geo);
+
+%let geosuf = %sysfunc( putc( %upcase(&geo), $geosuf. ) );
 
 data hmda_sum_p09_&geosuf;
 	merge hmda_long00_&geosuf. hmda_long10_&geosuf.;
@@ -202,20 +204,20 @@ revisions=&revisions.
 );
 
 %mend hmda_merge;
-%hmda_merge (geo2000,tr00);
-%hmda_merge (geo2010,tr10);
-%hmda_merge (anc2002,anc02);
-%hmda_merge (anc2012,anc12);
-%hmda_merge (bridgepk,bpk);
-%hmda_merge (city,city);
-%hmda_merge (cluster2017,cl17);
-%hmda_merge (cluster_tr2000,cltr00);
-%hmda_merge (eor,eor);
-%hmda_merge (stantoncommons,stanc);
-%hmda_merge (voterpre2012,vp12);
-%hmda_merge (ward2002,wd02);
-%hmda_merge (ward2012,wd12);
-%hmda_merge (zip,zip);
+%hmda_merge (geo2000);
+%hmda_merge (geo2010);
+%hmda_merge (anc2002);
+%hmda_merge (anc2012);
+%hmda_merge (bridgepk);
+%hmda_merge (city);
+%hmda_merge (cluster2017);
+%hmda_merge (cluster_tr2000);
+%hmda_merge (eor);
+%hmda_merge (stantoncommons);
+%hmda_merge (voterpre2012);
+%hmda_merge (ward2002);
+%hmda_merge (ward2012);
+%hmda_merge (zip);
 
 
 
