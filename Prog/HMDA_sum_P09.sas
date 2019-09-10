@@ -26,7 +26,7 @@
 %let start_yr = 2009;
 %let end_yr = 2017;
 
-%let revisions = New file ;
+%let revisions = Update tract data to include entire region ;
 
 %let tr2000data = hmda2009tr hmda2010tr hmda2011tr;
 %let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr;
@@ -177,10 +177,12 @@ quit;
 
 
 /* Merge summary files together into one big summary file */
-%macro hmda_merge(geo,geosuf);
+%macro hmda_merge(geo);
 
-data hmda_sum_p09_&geosuf;
-	merge hmda_long00_&geosuf. hmda_long10_&geosuf.;
+%let geosuf = %sysfunc( putc( %upcase(&geo), $geosuf. ) );
+
+data hmda_sum_p09&geosuf;
+	merge hmda_long00&geosuf. hmda_long10&geosuf.;
 	by &geo.;
 
 	%if &geo. = geo2010 %then %do;
@@ -191,8 +193,8 @@ run;
 
 /* Save final summary file */
 %Finalize_data_set( 
-data=hmda_sum_p09_&geosuf,
-out=hmda_sum_p09_&geosuf,
+data=hmda_sum_p09&geosuf,
+out=hmda_sum_p09&geosuf,
 outlib=hmda,
 label="HMDA summary, DC, &start_yr. - &end_yr.",
 sortby=&geo.,
@@ -202,20 +204,20 @@ revisions=&revisions.
 );
 
 %mend hmda_merge;
-%hmda_merge (geo2000,tr00);
-%hmda_merge (geo2010,tr10);
-%hmda_merge (anc2002,anc02);
-%hmda_merge (anc2012,anc12);
-%hmda_merge (bridgepk,bpk);
-%hmda_merge (city,city);
-%hmda_merge (cluster2017,cl17);
-%hmda_merge (cluster_tr2000,cltr00);
-%hmda_merge (eor,eor);
-%hmda_merge (stantoncommons,stanc);
-%hmda_merge (voterpre2012,vp12);
-%hmda_merge (ward2002,wd02);
-%hmda_merge (ward2012,wd12);
-%hmda_merge (zip,zip);
+%hmda_merge (geo2000);
+%hmda_merge (geo2010);
+%hmda_merge (anc2002);
+%hmda_merge (anc2012);
+%hmda_merge (bridgepk);
+%hmda_merge (city);
+%hmda_merge (cluster2017);
+%hmda_merge (cluster_tr2000);
+%hmda_merge (eor);
+%hmda_merge (stantoncommons);
+%hmda_merge (voterpre2012);
+%hmda_merge (ward2002);
+%hmda_merge (ward2012);
+%hmda_merge (zip);
 
 
 
