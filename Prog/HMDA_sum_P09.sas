@@ -181,8 +181,8 @@ quit;
 
 %let geosuf = %sysfunc( putc( %upcase(&geo), $geosuf. ) );
 
-data hmda_sum_p09_&geosuf;
-	merge hmda_long00_&geosuf. hmda_long10_&geosuf.;
+data hmda_sum_p09&geosuf;
+	merge hmda_long00&geosuf. hmda_long10&geosuf.;
 	by &geo.;
 
 	%if &geo. = geo2010 %then %do;
@@ -193,8 +193,8 @@ run;
 
 /* Save final summary file */
 %Finalize_data_set( 
-data=hmda_sum_p09_&geosuf,
-out=hmda_sum_p09_&geosuf,
+data=hmda_sum_p09&geosuf,
+out=hmda_sum_p09&geosuf,
 outlib=hmda,
 label="HMDA summary, DC, &start_yr. - &end_yr.",
 sortby=&geo.,
