@@ -422,9 +422,45 @@ run;
 
 %do year = 2008 %to 2017 ;
 
-data loans_was15_&year.;
+data loans_allgeo_&year.;
 	set Hmda_dc_&year._clean Hmda_md_&year._clean Hmda_va_&year._clean Hmda_wv_&year._clean;
 run;
+
+proc contents data = loans_allgeo_&year. out = cont_&year.;
+run;
+
+data cont_ch_&year.;
+	set cont_&year.;
+	if type = 2;
+run;
+
+proc sql noprint;
+	select name
+	into :vars separated by " "
+	from cont_ch_&year.;
+quit;
+
+data loans_was15_&year.;
+	set loans_allgeo_&year.;
+
+	%macro fixzero();
+		%let varlist = &vars.;
+			%let i = 1;
+				%do %until (%scan(&varlist,&i,' ')=);
+					%let var=%scan(&varlist,&i,' ');
+			if &var. = "." then &var. = " " ;
+		%let i=%eval(&i + 1);
+				%end;
+			%let i = 1;
+				%do %until (%scan(&varlist,&i,' ')=);
+					%let var=%scan(&varlist,&i,' ');
+		%let i=%eval(&i + 1);
+				%end;
+	%mend fixzero;
+	%fixzero;
+
+run;
+
 
 %Finalize_data_set( 
   /** Finalize data set parameters **/
