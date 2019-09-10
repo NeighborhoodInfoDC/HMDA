@@ -30,16 +30,14 @@
 data apps&year.;
 	set hmda.loans_&year.;
 
-	/*Keep DC records */
-	if ucounty = "11001";
-
 	/* Format and keep valid formats */
-	format &geo. geo00a.;
-
 	%let geo = %upcase( &geo. );
     %let geovfmt = %sysfunc( putc( &geo, $geovfmt. ) );
+	%let geoafmt = %sysfunc( putc( &geo, $geoafmt. ) );
 
     if put( &geo., &geovfmt ) ^= " ";
+
+	format &geo. &geoafmt.;
 
 
 	/* Flag each record as an application */
@@ -308,7 +306,7 @@ data hmda&year.tr;
 	merge apps&year.tr (drop = _type_ _freq_)
 	med&year.tr (drop = _type_ _freq_) ;
 	by &geo.; 
-	if &geo. ^= " ";
+	if &geo. ^= '';
 run;
 
 %end;
