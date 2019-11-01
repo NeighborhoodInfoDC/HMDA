@@ -314,12 +314,12 @@ data hmda_&state._&year._clean;
 	ethn = put(applicant_ethnicity_1,1.);
 	hoepa = put(hoepa_status,1.);
 	hudmdinc = ffiec_msa_md_median_income;
-	income = app_income +0;
+	income = app_income *1000;
 	lien = put(lien_status,1.);
 	loantype = put(loan_type,1.);
 	metro = put(derived_msa_md,5.);
 	occupanc = put(occupancy_type,1.);
-	prch_typ = put(purchaser_type,1.);
+	prch_typ = left(put(purchaser_type,2.));
 	preapp = put(preapproval,1.);
 	purpose = left(put(loan_purpose,2.)); 
 	race2 = put(applicant_race_2,1.);
@@ -328,12 +328,18 @@ data hmda_&state._&year._clean;
 	race5 = put(applicant_race_5,1.);
 	rtspread = rate_spread + 0;
 	seq = lei;
-	*type = put(property_type,1.);
 	county = substr(county_code,2,3);
 	year = put(activity_year,4.);
 	state = put(state_code,2.);
 	tract = census_tract;
 	*missingtract = tract_flag;
+
+	if derived_dwelling_category = "Single Family (1-4 Units):Site-Built" then property_type = "1";
+		else if derived_dwelling_category = "Single Family (1-4 Units):Manufactured" then property_type = "2";
+		else if derived_dwelling_category = "Multifamily:Site-Built" then property_type = "3";
+		else if derived_dwelling_category = "Multifamily:Manufactured" then property_type = "3";
+		
+	type = put(property_type,1.);
 
 	/* Combined ucounty and geo2000/geo2010 */
 	if county_code ^= "NA" then ucounty = county_code;
@@ -350,7 +356,7 @@ data hmda_&state._&year._clean;
 	          else high_interest = 0;
 	end;
 
-run;
+
 
 	/* Create unique lender ID */
 	resp = compress(respondent_id,"-");
@@ -427,7 +433,7 @@ run;
 	coapsex deny1 deny2 deny3 edit ethn hoepa hudmdinc income lien loantype metro occupanc prch_typ
 	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest;
 
-
+run;
 	/* Make sure missing is coded correctly */
 	%let clist = action agency appdate appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4
 				 coaprac5 coapsex deny1 deny2 deny3 edit ethn hoepa lien metro occupanc prch_typ preapp
