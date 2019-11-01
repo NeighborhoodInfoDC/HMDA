@@ -149,7 +149,8 @@ proc format library=Hmda;
     "6" = "Unverifiable information"
     "7" = "Credit application incomplete"
     "8" = "Mortgage insurance denied"
-    "9" = "Other";
+    "9" = "Other"
+	"10" = "Not applicable";
     
   /** OTHER **/
   
