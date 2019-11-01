@@ -260,10 +260,10 @@ data hmda_&state._&year._clean;
 		   coaprac4 $1.
 		   coaprac5 $1.
 		   coapsex $1.
-		   deny1 $1.
-		   deny2 $1.
-		   deny3 $1.
-		   deny4 $1.
+		   deny1 $2.
+		   deny2 $2.
+		   deny3 $2.
+		   deny4 $2.
 		   ethn $1.
 		   hoepa $1.
 		   lien $1.
@@ -297,10 +297,10 @@ data hmda_&state._&year._clean;
 	coaprac4 = put(co_applicant_race_4,1.); 
 	coaprac5 = put(co_applicant_race_5,1.); 
 	coapsex = put(co_applicant_sex,1.);
-	deny1 = put(denial_reason_1,1.);
-	deny2 = put(denial_reason_2,1.);
-	deny3 = put(denial_reason_3,1.);
-	deny4 = put(denial_reason_4,1.);
+	deny1 = left(put(denial_reason_1,2.));
+	deny2 = left(put(denial_reason_2,2.));
+	deny3 = left(put(denial_reason_3,2.));
+	deny4 = left(put(denial_reason_4,2.));
 	ethn = put(applicant_ethnicity_1,1.);
 	hoepa = put(hoepa_status,1.);
 	hudmdinc = ffiec_msa_md_median_income;
@@ -347,10 +347,8 @@ data hmda_&state._&year._clean;
 
 
 	/* High interest */
-	if rtspread ^=. then do;
 		if rtspread > 0 then high_interest = 1;
 	          else high_interest = 0;
-	end;
 
 
 	/* Create unique lender ID */
@@ -417,9 +415,7 @@ data hmda_&state._&year._clean;
 	missingtract = "Flag for missing tract ID on raw data"
 	;
 
-	keep action amount apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
-	coapsex deny1 deny2 deny3 edit ethn hoepa hudmdinc income lien loantype metro occupanc prch_typ
-	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest geo2010;
+
 
 
 	/* Make sure missing is coded correctly */
@@ -447,6 +443,10 @@ data hmda_&state._&year._clean;
 
 	/* Final keep */
 	if put( ucounty, $ctym15f. ) ^= " ";
+
+	keep action amount apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
+	coapsex deny1 deny2 deny3 edit ethn hoepa hudmdinc income lien loantype occupanc prch_typ
+	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest geo2010;
 
 
 
@@ -512,12 +512,6 @@ run;
   /** File info parameters **/
   printobs=5
 );
-
-%end;
-
-%mend hmda_finalize;
-%hmda_finalize;
-
 
 
 /* End of program */
