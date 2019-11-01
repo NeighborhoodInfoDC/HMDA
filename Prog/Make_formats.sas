@@ -75,7 +75,8 @@ proc format library=Hmda;
     "1" = "Home purchase (pre-2004, 1-4 family only)"
     "2" = "Home improvement (pre-2004, 1-4 family only)"
     "3" = "Refinancing (pre-2004, 1-4 family only)"
-    "4" = "Multifamily dwelling (pre-2004)";
+    "4" = "Other purpose"
+	"5" = "Not applicable";
 
   value $preapp
     "1" = "Preapproval was requested"
@@ -105,9 +106,8 @@ proc format library=Hmda;
     "3" = "Black"
     "4" = "Hispanic"
     "5" = "White"
-    "6" = "Other race"
-    "7" = "Not provided"
-    "8" = "Not applicable";
+    "6" = "Not provided"
+    "7" = "Not applicable";
 
   value $hmdethn
     "1" = "Hispanic/Latino"
@@ -121,7 +121,8 @@ proc format library=Hmda;
     "2" = "Female"
     "3" = "Not provided"
     "4" = "Not applicable"
-    "5" = "No co-applicant";
+    "5" = "No co-applicant"
+	"6" = "Applicant selected both male and female";
 
   /** PURCHASER AND DENIAL INFORMATION **/
 
@@ -133,7 +134,7 @@ proc format library=Hmda;
     "4" = "Federal Agricultural Mortgage Corporation"
     "5" = "Commercial bank"
     "6" = "Savings bank or savings association"
-    "7" = "Life insurance company"
+    "7" = "Credit union, mortgage company, finance company, or life insurance company"
     "8" = "Affiliate Institution"
     "9" = "Other type of purchaser";
 
@@ -160,7 +161,8 @@ proc format library=Hmda;
     
   value $hoepa
     "1" = "HOEPA loan"
-    "2" = "Not a HOEPA loan";
+    "2" = "Not a HOEPA loan"
+	"3" = "Not applicable";
     
   value $lien
     "1" = "Secured by first lien"
