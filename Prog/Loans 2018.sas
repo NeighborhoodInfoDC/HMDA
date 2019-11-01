@@ -19,11 +19,6 @@
 
 %let revisions = New file ;
 %let year = 2018;
-%let state = DC;
-
-/*%macro hmda_input (state);
-
-%do year = 2008 %to 2017 ;*/
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
 %let filename = 2018_lar.txt;
@@ -238,6 +233,7 @@ data hmda_country_&year._raw;
 
 run;
 
+%macro hmda_input (state);
 
 /* Process a clean HMDA file for each state */
 proc sql noprint;
@@ -254,9 +250,7 @@ data hmda_&state._&year._clean;
 
 	/* Set length for variables */
 	length action $1.
-	 	   /*agency $1.*/
 		   appdate $1.
-		   /*appdate $1.*/
 		   apprac $1.
 		   appsex $1.
 		   coapethn $1.
@@ -270,7 +264,6 @@ data hmda_&state._&year._clean;
 		   deny2 $1.
 		   deny3 $1.
 		   deny4 $1.
-		   /*edit $1.*/
 		   ethn $1.
 		   hoepa $1.
 		   lien $1.
@@ -283,7 +276,7 @@ data hmda_&state._&year._clean;
 		   race3 $1.
 		   race4 $1.
 		   race5 $1.
-		   /*type $1.*/
+		   type $1.
 		   county $3.
 		   ucounty $5.
 		   year $4.
@@ -294,10 +287,8 @@ data hmda_&state._&year._clean;
 
 	/* Create clean versions of variables */
 	action = put(action_taken,1.);
-	*agency = put(agency_code,1.);
 	amount = loan_amount +0;
-	*appdate = put(application_date_indicator,1.);
-	apprac = put(applicant_race_1,1.); *Need to update this *;
+	apprac = put(applicant_race_1,1.);
 	appsex = put(applicant_sex,1.);
 	coapethn = put(co_applicant_ethnicity_1,1.);
 	coaprac = put(co_applicant_race_1,1.); 
@@ -310,7 +301,6 @@ data hmda_&state._&year._clean;
 	deny2 = put(denial_reason_2,1.);
 	deny3 = put(denial_reason_3,1.);
 	deny4 = put(denial_reason_4,1.);
-	*edit = put(edit_status,1.);
 	ethn = put(applicant_ethnicity_1,1.);
 	hoepa = put(hoepa_status,1.);
 	hudmdinc = ffiec_msa_md_median_income;
@@ -332,8 +322,9 @@ data hmda_&state._&year._clean;
 	year = put(activity_year,4.);
 	state = put(state_code,2.);
 	tract = census_tract;
-	*missingtract = tract_flag;
 
+
+	/* Property type changed in raw data to derived dwelling */
 	if derived_dwelling_category = "Single Family (1-4 Units):Site-Built" then property_type = "1";
 		else if derived_dwelling_category = "Single Family (1-4 Units):Manufactured" then property_type = "2";
 		else if derived_dwelling_category = "Multifamily:Site-Built" then property_type = "3";
@@ -341,14 +332,19 @@ data hmda_&state._&year._clean;
 		
 	type = put(property_type,1.);
 
+
+	/* Flag for missing tracts */
+	if tract = " " then missingtract = 1;
+		else missingtract = 0;
+
+
 	/* Combined ucounty and geo2000/geo2010 */
 	if county_code ^= "NA" then ucounty = county_code;
-	if put( ucounty, $ctym15f. ) ^= " ";
 
 	if tract ^= "NA" then tract_c = tract;
 	geo2010 = ucounty || tract_c ;
 	label geo2010 = "Full census tract ID (2010): ssccctttttt";
-	*keep geo2010;
+
 
 	/* High interest */
 	if rtspread ^=. then do;
@@ -357,22 +353,17 @@ data hmda_&state._&year._clean;
 	end;
 
 
-
 	/* Create unique lender ID */
 	resp = compress(respondent_id,"-");
 	ulender = year || lei;
 
 
-
 	/* Format everything */
 	format action $action.
-		   agency $agencyf.
-		   appdate $appdate.
 		   apprac coaprac coaprac2 coaprac3 coaprac4 coaprac5 race2 race3 race4 race5 $hmdrace.
 		   appsex coapsex $hmdsex.
 		   coapethn ethn $hmdethn.
 		   deny1 deny2 deny3 $deny.
-		   edit $edit.
 		   hoepa $hoepa.
 		   lien $lien.
 		   loantype loantyp.
@@ -388,9 +379,7 @@ data hmda_&state._&year._clean;
 	/* Labels */
 	label 
 	action = "Type of Action Taken"
-	agency = "Agency Code"
 	amount = "Loan amount ($)"
-	appdate = "Application date prior to HMDA reporting year "
 	apprac = "Applicant Race 1"
 	appsex = "Applicant Sex"
 	coapethn = "Co-Applicant Ethnicity"
@@ -403,7 +392,6 @@ data hmda_&state._&year._clean;
 	deny1 = "Denial Reason 1"
 	deny2 = "Denial Reason 2"
 	deny3 = "Denial Reason 3"
-	edit = "Loan record edit status"
 	ethn = "Applicant Ethnicity"
 	hoepa = "HOEPA status (only for loans originated or purchased"
 	hudmdinc = "HUD median family income ($)"
@@ -429,14 +417,14 @@ data hmda_&state._&year._clean;
 	missingtract = "Flag for missing tract ID on raw data"
 	;
 
-	*keep action agency amount appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
+	keep action amount apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4 coaprac5
 	coapsex deny1 deny2 deny3 edit ethn hoepa hudmdinc income lien loantype metro occupanc prch_typ
-	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest;
+	preapp purpose race2 race3 race4 race5 rtspread seq type ucounty ulender year high_interest geo2010;
 
-run;
+
 	/* Make sure missing is coded correctly */
-	%let clist = action agency appdate appdate apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4
-				 coaprac5 coapsex deny1 deny2 deny3 edit ethn hoepa lien metro occupanc prch_typ preapp
+	%let clist = action apprac appsex coapethn coaprac coaprac2 coaprac3 coaprac4
+				 coaprac5 coapsex deny1 deny2 deny3 ethn hoepa lien metro occupanc prch_typ preapp
 				 purpose race2 race3 race4 race5 type county ucounty year state tract ;
 
 	%macro fixmissing();
@@ -464,19 +452,12 @@ run;
 
 run;
 
-%end;
-
 %mend hmda_input;
 %hmda_input (DC);
 %hmda_input (MD);
 %hmda_input (VA);
 %hmda_input (WV);
 
-
-/* Combine to create metro area files by year */
-%macro hmda_finalize ();
-
-%do year = 2008 %to 2017 ;
 
 data loans_allgeo_&year.;
 	set Hmda_dc_&year._clean Hmda_md_&year._clean Hmda_va_&year._clean Hmda_wv_&year._clean;
