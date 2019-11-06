@@ -250,7 +250,6 @@ data hmda_&state._&year._clean;
 
 	/* Set length for variables */
 	length action $1.
-		   appdate $1.
 		   apprac $1.
 		   appsex $1.
 		   coapethn $1.
@@ -352,7 +351,6 @@ data hmda_&state._&year._clean;
 
 
 	/* Create unique lender ID */
-	resp = compress(respondent_id,"-");
 	ulender = year || lei;
 
 
