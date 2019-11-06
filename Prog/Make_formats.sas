@@ -108,6 +108,7 @@ proc format library=Hmda;
     "5" = "White"
     "6" = "Not provided"
     "7" = "Not applicable";
+	"8" = "No co-applicant";
 
   value $hmdethn
     "1" = "Hispanic/Latino"
@@ -123,6 +124,8 @@ proc format library=Hmda;
     "4" = "Not applicable"
     "5" = "No co-applicant"
 	"6" = "Applicant selected both male and female";
+
+
 
   /** PURCHASER AND DENIAL INFORMATION **/
 
