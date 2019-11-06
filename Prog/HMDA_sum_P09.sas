@@ -24,12 +24,12 @@
 %DCData_lib( ipums )
 
 %let start_yr = 2009;
-%let end_yr = 2017;
+%let end_yr = 2018;
 
-%let revisions = Update tract data to include entire region ;
+%let revisions = Update with 2018 HMDA data ;
 
 %let tr2000data = hmda2009tr hmda2010tr hmda2011tr;
-%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr;
+%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr hmda2018tr;
 
 
 
