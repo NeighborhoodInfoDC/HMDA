@@ -340,8 +340,7 @@ data hmda_&state._&year._clean;
 	/* Combined ucounty and geo2000/geo2010 */
 	if county_code ^= "NA" then ucounty = county_code;
 
-	if tract ^= "NA" then tract_c = tract;
-	geo2010 = ucounty || tract_c ;
+	if census_tract ^= "NA" then geo2010 = census_tract;
 	label geo2010 = "Full census tract ID (2010): ssccctttttt";
 
 
