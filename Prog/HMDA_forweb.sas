@@ -25,7 +25,7 @@
 %let start = 1997; /* Start year */
 %let end = 2018; /* End year */
 %let keepvars = NumMrtgOrigHomePurch1_4m HUnits 
-           NumConvMrtgOrigHomePurch; /*NumSubprimeConvOrigHomePur MedianMrtgInc1_4m_adj ;  Summary variables to keep and transpose */
+           NumConvMrtgOrigHomePurch MedianMrtgInc1_4m ; /*NumSubprimeConvOrigHomePur  ;  Summary variables to keep and transpose */
 
 
 /***** Update the web_varcreate marcro if you need to create final indicators for the website after transposing *****/
@@ -37,7 +37,9 @@ NumMrtgOrigHomePurchPerUnit = NumMrtgOrigHomePurch1_4m / HUnits *1000;
 
 label NumMrtgOrigHomePurchPerUnit = "Loans per 1,000 housing units";
 *label PctSubprimeConvOrigHomePur = "% subprime loans";
-label MedianMrtgInc1_4m_adj = "Median borrower income";
+*label MedianMrtgInc1_4m_adj = "Median borrower income";
+label MedianMrtgInc1_4m = "Median borrower income";
+
 
 drop NumMrtgOrigHomePurch1_4m NumMrtgOrigHomePurch1_4m /*NumSubprimeConvOrigHomePur*/ NumConvMrtgOrigHomePurch HUnits;
 
@@ -79,7 +81,7 @@ drop NumMrtgOrigHomePurch1_4m NumMrtgOrigHomePurch1_4m /*NumSubprimeConvOrigHome
 
 %housing_unit_count (&geo.);
 
-proc sort data = Ncdb_hu_count_wd12; by &sortvar.; run;
+proc sort data = Ncdb_hu_count_&geo.; by &sortvar.; run;
 proc sort data = &library..&sumdata._&geo. out = &sumdata._&geo.; by &sortvar.; run;
 proc sort data = &library..&sumdata._p09_&geo. out = &sumdata._p09_&geo.; by &sortvar.; run;
 
@@ -105,26 +107,12 @@ run;
 proc contents data = &sumdata._&geo._long_allyr out = &sumdata._&geo._metadata noprint;
 run;
 
-/* Output the metadata 
-ods csv file ="&_dcdata_default_path.\web\output\&outfolder.\&outfolder._&geo._metadata..csv";
-	proc print data =&sumdata._&geo._metadata noobs;
-	run;
-ods csv close;*/
-
-
-/* Output the CSV 
-ods csv file ="&_dcdata_default_path.\web\output\&outfolder.\&outfolder._&geo..csv";
-	proc print data =&sumdata._&geo._long_allyr noobs;
-	run;
-ods csv close*/
-
-
 %mend csv_create;
 %csv_create (tr10);
 %csv_create (anc12);
-%csv_create (wd02);
 %csv_create (wd12);
 %csv_create (city);
 %csv_create (psa12);
 %csv_create (zip);
+%csv_create (cl17);
 
