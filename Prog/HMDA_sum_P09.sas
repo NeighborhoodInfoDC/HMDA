@@ -217,6 +217,7 @@ revisions=&revisions.
 %hmda_merge (voterpre2012);
 %hmda_merge (ward2002);
 %hmda_merge (ward2012);
+%hmda_merge (psa2012);
 %hmda_merge (zip);
 
 
