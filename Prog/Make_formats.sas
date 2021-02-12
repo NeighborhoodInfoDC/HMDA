@@ -15,7 +15,7 @@
   08/28/18  RP Updated $agencys
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas"; 
+%include "\\sas1\dcdata\SAS\Inc\StdLocal.sas"; 
 
 ** Define libraries **;
 %DCData_lib( Hmda )
@@ -107,7 +107,7 @@ proc format library=Hmda;
     "4" = "Hispanic"
     "5" = "White"
     "6" = "Not provided"
-    "7" = "Not applicable";
+    "7" = "Not applicable"
 	"8" = "No co-applicant";
 
   value $hmdethn
