@@ -21,7 +21,7 @@
 %let year = 2019;
 
 %let rawpath = &_dcdata_r_path\HMDA\Raw\;
-%let filename = 2019_lar.txt;
+%let filename = 2019_public_lar_pipe.txt;
 
 /* Read raw loan-level HMDA from TXT file */
 filename fimport "&rawpath.&filename." lrecl=2000;
