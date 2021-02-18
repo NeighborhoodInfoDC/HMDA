@@ -13,23 +13,23 @@
  When updating: Make sure there is an updated version of %hud_inc_yyyy
 			    in the iPums macro library. 
  
- Modifications:
+ Modifications: 2/18/21: updated to add 2019 loans files (ALH)
  
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas"; 
+%include "\\SAS1\DCDData\SAS\Inc\StdLocal.sas"; 
 
 ** Define libraries **;
 %DCData_lib( HMDA )
 %DCData_lib( ipums )
 
 %let start_yr = 2009;
-%let end_yr = 2018;
+%let end_yr = 2019;
 
-%let revisions = Update with 2018 HMDA data ;
+%let revisions = Update with 2019 HMDA data ;
 
 %let tr2000data = hmda2009tr hmda2010tr hmda2011tr;
-%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr hmda2018tr;
+%let tr2010data = hmda2012tr hmda2013tr hmda2014tr hmda2015tr hmda2016tr hmda2017tr hmda2018tr hmda2019tr;
 
 
 
