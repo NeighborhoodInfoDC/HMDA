@@ -17,7 +17,7 @@
  
 **************************************************************************/
 
-%include "\\SAS1\DCDData\SAS\Inc\StdLocal.sas"; 
+%include "\\SAS1\DCData\SAS\Inc\StdLocal.sas"; 
 
 ** Define libraries **;
 %DCData_lib( HMDA )
