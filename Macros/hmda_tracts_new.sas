@@ -56,7 +56,7 @@ data apps&year.;
 	%prop_type;
 
 	/* Income recodes */
-	if income < 0 then hhincome = .;
+	if income < 0 then hhincome = .n;
 		else hhincome=income;
 	if amount < 0 then amount = .;
 		else amount=amount;
@@ -90,7 +90,7 @@ data apps&year.;
 		else highflag=0;
 
 	/* Create income categories from ipums %hud_inc macro */
-	if hhincome ^= . then do;
+	if hhincome ^= .n then do;
 	numprec = 4;
 	end;
 
