@@ -56,7 +56,7 @@ data apps&year.;
 	%prop_type;
 
 	/* Income recodes */
-	if income < 0 then hhincome = .;
+	if income < 0 then hhincome = .n;
 		else hhincome=income;
 	if amount < 0 then amount = .;
 		else amount=amount;
@@ -90,7 +90,7 @@ data apps&year.;
 		else highflag=0;
 
 	/* Create income categories from ipums %hud_inc macro */
-	if hhincome ^= . then do;
+	if hhincome ^= .n then do;
 	numprec = 4;
 	end;
 
@@ -202,13 +202,13 @@ data apps&year.;
 	label NumConvMrtgOrigRefin_&year. = "Conventional mortgage loans for refinance, &year.";
 
 	/* Denials of conventional home purchase loans */
-	if deny1 > 0 and conv = 1 then NumMrtgPurchDenial_&year. = 1;
+	if deny1 in (1,2,3,4,5,6,7,8,9) and conv = 1 then NumMrtgPurchDenial_&year. = 1;
 		else NumMrtgPurchDenial_&year. = 0;
 
 	label NumMrtgPurchDenial_&year. = "Denials of conventional home purchase loans, &year.";
 
 	/* Denials of conventional home purchase loans by income */
-	if deny1 > 0 and conv = 1 then do;
+	if deny1 in (1,2,3,4,5,6,7,8,9) and conv = 1 then do;
 		if hud_inc in (1,2) then nummrtgpurchdenial_vli_&year. = 1;
 			else nummrtgpurchdenial_vli_&year. = 0;
 		if hud_inc in (3) then nummrtgpurchdenial_li_&year. = 1;
@@ -226,7 +226,7 @@ data apps&year.;
 	;
 
 	/* Denials of conventional home purchase loans by race */
-	if deny1 > 0 and  conv = 1 then do;
+	if deny1 in (1,2,3,4,5,6,7,8,9) and  conv = 1 then do;
 		if bl = 1 then nummrtgpurchdenial_bl_&year. = 1;
 			else nummrtgpurchdenial_bl_&year. = 0;
 		if wh = 1 then nummrtgpurchdenial_wh_&year. = 1;
